@@ -14,7 +14,7 @@ window.JIREH_CONFIG = {
   // En Google Sheets: Archivo > Compartir > Publicar en la web >
   // elegí la hoja de productos y el formato "Valores separados por comas (.csv)".
   // Si lo dejás vacío, se usa el archivo local data/productos.csv
-  sheetCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQkzX6pSXmkPoy7k_sDXH-WRXDeR4fA4ekYvkmks1q76kXd5Ioun2riqxOng2F_JKQRFF9HE7Weo_CQ/pub?output=csv",
+  sheetCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQkzX6pSXmkPoy7k_sDXH-WRXDeR4fA4ekYvkmks1q76kXd5Ioun2riqxOng2F_JKQRFF9HE7Weo_CQ/pub?gid=358716461&single=true&output=csv",
 
   // Moneda y formato de precios
   currency: "ARS",
