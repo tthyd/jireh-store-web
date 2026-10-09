@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jireh Store</title>
+  <meta name="description" content="Jireh Store — elegí tus productos y hacé tu pedido por WhatsApp." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a href="#" class="brand">Jireh <span>Store</span></a>
+      <button class="cart-btn" id="cartOpen" aria-label="Abrir carrito">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7L6 7z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg>
+        <span class="cart-count" id="cartCount">0</span>
+      </button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <p class="eyebrow">Tienda online</p>
+      <h1>Todo lo que necesitás, <em>en un solo lugar.</em></h1>
+      <p class="hero-sub">Elegí tus productos, armá tu carrito y envianos el pedido por WhatsApp. Así de simple.</p>
+    </div>
+  </section>
+
+  <main class="container">
+    <div class="toolbar">
+      <input type="search" id="search" placeholder="Buscar productos…" aria-label="Buscar productos" />
+      <div class="chips" id="categories" role="tablist"></div>
+    </div>
+
+    <div id="status" class="status">Cargando productos…</div>
+    <div class="grid" id="products"></div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>© <span id="year"></span> Jireh Store · Pedidos por WhatsApp</p>
+    </div>
+  </footer>
+
+  <!-- Modal de producto -->
+  <div class="overlay" id="productOverlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="pmTitle">
+      <button class="icon-close" data-close aria-label="Cerrar">×</button>
+      <img id="pmImage" alt="" />
+      <div class="modal-body">
+        <p class="eyebrow" id="pmCategory"></p>
+        <h2 id="pmTitle"></h2>
+        <p class="price" id="pmPrice"></p>
+        <p class="desc" id="pmDesc"></p>
+        <p class="stock" id="pmStock"></p>
+        <div class="modal-actions">
+          <div class="qty">
+            <button id="pmMinus" aria-label="Restar">−</button>
+            <span id="pmQty">1</span>
+            <button id="pmPlus" aria-label="Sumar">+</button>
+          </div>
+          <button class="btn btn-primary" id="pmAdd">Agregar al carrito</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Carrito -->
+  <div class="overlay" id="cartOverlay" hidden>
+    <aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="cartTitle">
+      <div class="drawer-head">
+        <h2 id="cartTitle">Tu carrito</h2>
+        <button class="icon-close" data-close aria-label="Cerrar">×</button>
+      </div>
+
+      <div class="drawer-body">
+        <ul class="cart-list" id="cartItems"></ul>
+        <p class="empty" id="cartEmpty">Tu carrito está vacío.</p>
+
+        <form id="checkout" class="checkout" hidden>
+          <h3>Tus datos</h3>
+          <label>Nombre y apellido
+            <input name="nombre" required autocomplete="name" />
+          </label>
+          <label>Entrega
+            <select name="entrega" id="deliverySelect"></select>
+          </label>
+          <label id="addressField" hidden>Dirección
+            <input name="direccion" autocomplete="street-address" />
+          </label>
+          <label>Notas (opcional)
+            <textarea name="notas" rows="2" placeholder="Talle, color, horario…"></textarea>
+          </label>
+        </form>
+      </div>
+
+      <div class="drawer-foot" id="cartFoot" hidden>
+        <div class="total-row"><span>Total</span><strong id="cartTotal">$0</strong></div>
+        <button type="submit" form="checkout" class="btn btn-whatsapp">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg>
+          Enviar pedido por WhatsApp
+        </button>
+        <button class="btn-link" id="cartClear">Vaciar carrito</button>
+      </div>
+    </aside>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
