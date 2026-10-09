@@ -45,7 +45,7 @@ Cuando el cliente toca **Enviar pedido por WhatsApp**, se abre WhatsApp con el m
    - **precio**: número (`18500` o `18.500` sirven).
    - **stock**: si es `0` el producto aparece como *Agotado*. Si lo dejás vacío, no se controla stock. Con 3 o menos muestra "¡Últimas N!".
    - **imagen**: URL pública de la foto. Si está vacía se usa una imagen genérica.
-   - **activo**: poné `no` para ocultar un producto sin borrarlo.
+   - **activo**: casilla (check). Tildada = el producto se ve en la web; sin tildar = oculto, sin borrarlo. También se acepta `si`/`no` escrito a mano.
    - **id**: un identificador único que no cambie (el carrito del cliente se guarda por id).
 
 2. En Google Sheets: **Archivo → Compartir → Publicar en la web**.

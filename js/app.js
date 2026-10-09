@@ -57,7 +57,9 @@
       stock: stockRaw === "" ? Infinity : Math.max(0, parseInt(stockRaw, 10) || 0),
       category: row.categoria || row.category || "Otros",
       image: row.imagen || row.image || row.foto || `img/productos/${String(row.id || index + 1)}.jpg`,
-      active: !/^(no|false|0|n)$/i.test(row.activo ?? row.active ?? ""),
+      // activo es una casilla en el Sheet (TRUE/FALSE). También se acepta si/no.
+      // Una celda vacía (casilla sin tildar) cuenta como oculto.
+      active: /^(true|si|sí|yes|y|s|1|x)$/i.test(String(row.activo ?? row.active ?? "").trim()),
     };
   }
 
