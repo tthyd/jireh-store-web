@@ -5,43 +5,68 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Jireh Store</title>
   <meta name="description" content="Jireh Store — elegí tus productos y hacé tu pedido por WhatsApp." />
+  <meta property="og:title" content="Jireh Store" />
+  <meta property="og:description" content="Elegí tus productos y hacé tu pedido por WhatsApp." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#faf7f2" />
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Geist:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
+  <a class="skip-link" href="#main">Ir a los productos</a>
   <header class="topbar">
     <div class="container topbar-inner">
-      <a href="#" class="brand">Jireh <span>Store</span></a>
+      <a href="./" class="brand">Jireh <span>Store</span></a>
       <button class="cart-btn" id="cartOpen" aria-label="Abrir carrito">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7L6 7z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg>
-        <span class="cart-count" id="cartCount">0</span>
+        <span class="cart-count" id="cartCount" hidden>0</span>
       </button>
     </div>
   </header>
 
   <section class="hero">
-    <div class="container">
-      <p class="eyebrow">Tienda online</p>
-      <h1>Todo lo que necesitás, <em>en un solo lugar.</em></h1>
-      <p class="hero-sub">Elegí tus productos, armá tu carrito y envianos el pedido por WhatsApp. Así de simple.</p>
+    <div class="container hero-inner">
+      <div class="hero-copy">
+        <p class="eyebrow">Tienda online</p>
+        <h1>Todo lo que necesitás, <em>en un solo lugar.</em></h1>
+        <p class="hero-sub">Elegí tus productos, armá tu carrito y envianos el pedido por WhatsApp. Así de simple.</p>
+      </div>
+      <!-- Se llena con los primeros productos con stock de la hoja -->
+      <div class="hero-art" id="heroArt" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </div>
     </div>
   </section>
 
-  <main class="container">
+  <main class="container" id="main">
     <div class="toolbar">
       <input type="search" id="search" placeholder="Buscar productos…" aria-label="Buscar productos" />
+      <select id="sort" aria-label="Ordenar productos">
+        <option value="default">Destacados</option>
+        <option value="price-asc">Menor precio</option>
+        <option value="price-desc">Mayor precio</option>
+        <option value="name">Nombre (A–Z)</option>
+      </select>
       <div class="chips" id="categories" role="tablist"></div>
     </div>
 
-    <div id="status" class="status">Cargando productos…</div>
-    <div class="grid" id="products"></div>
+    <div id="status" class="status" role="status"></div>
+    <div class="grid" id="products" aria-busy="true">
+      <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+      <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+    </div>
+    <div class="more" id="more" hidden>
+      <p id="moreCount"></p>
+      <button class="btn btn-outline" id="moreBtn">Ver más productos</button>
+    </div>
   </main>
 
   <footer class="footer">
     <div class="container">
-      <p>© <span id="year"></span> Jireh Store · Pedidos por WhatsApp</p>
+      <p>© <span id="year"></span> Jireh Store · Pedidos por WhatsApp · <a href="privacidad.html">Privacidad</a></p>
     </div>
   </footer>
 
@@ -55,6 +80,7 @@
         <h2 id="pmTitle"></h2>
         <p class="price" id="pmPrice"></p>
         <p class="desc" id="pmDesc"></p>
+        <div class="options" id="pmOptions"></div>
         <p class="stock" id="pmStock"></p>
         <div class="modal-actions">
           <div class="qty">
@@ -89,15 +115,28 @@
             <select name="entrega" id="deliverySelect"></select>
           </label>
           <label id="addressField" hidden>Dirección
-            <input name="direccion" autocomplete="street-address" />
+            <input name="direccion" autocomplete="street-address" aria-describedby="addressError" />
+            <span class="field-error" id="addressError" hidden>Completá la dirección para el envío.</span>
+          </label>
+          <div class="ship" id="shipBox" hidden>
+            <button type="button" class="ship-gps" id="gpsBtn">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+              Usar mi ubicación actual
+            </button>
+            <p class="ship-quote" id="shipQuote" aria-live="polite"></p>
+          </div>
+          <label id="dayField" hidden>Día de entrega
+            <select name="dia" id="daySelect"></select>
           </label>
           <label>Notas (opcional)
             <textarea name="notas" rows="2" placeholder="Talle, color, horario…"></textarea>
           </label>
+          <p class="privacy-note">Usamos tus datos (nombre, dirección y ubicación) solo para preparar y entregar tu pedido. Quedan en nuestro registro de pedidos y no se comparten con nadie. Si querés que los borremos, escribinos por WhatsApp. <a href="privacidad.html" target="_blank">Política de privacidad</a>.</p>
         </form>
       </div>
 
       <div class="drawer-foot" id="cartFoot" hidden>
+        <div class="sum-row" id="shipRow" hidden><span>Envío</span><span id="shipCost"></span></div>
         <div class="total-row"><span>Total</span><strong id="cartTotal">$0</strong></div>
         <button type="submit" form="checkout" class="btn btn-whatsapp">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg>

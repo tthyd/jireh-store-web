@@ -1,7 +1,7 @@
-id,nombre,descripcion,precio,stock,categoria,imagen,activo
-1,Remera Oversize Negra,"Remera de algodón peinado 24/1, corte oversize. Talles S a XL.",18500,12,Indumentaria,https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600,si
-2,Buzo Canguro Gris,"Buzo de frisa invisible con capucha y bolsillo canguro. Súper abrigado.",42000,5,Indumentaria,https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600,si
-3,Gorra Bordada,"Gorra trucker con logo bordado al frente, regulable.",12000,0,Accesorios,https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=600,si
-4,Taza Cerámica 350ml,"Taza de cerámica con diseño exclusivo. Apta microondas.",9500,20,Hogar,https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=600,si
-5,Tote Bag Natural,"Bolsa de lienzo 100% algodón, ideal para el día a día.",8000,8,Accesorios,https://images.unsplash.com/photo-1597484661643-2f5fef640dd1?w=600,si
-6,Vela Aromática,"Vela de soja con esencia de vainilla y coco. 40 horas de duración.",11000,3,Hogar,https://images.unsplash.com/photo-1602874801007-bd458bb1b8b6?w=600,si
+id,nombre,descripcion,precio,stock,categoria,imagen,activo,opciones
+1,Remera Oversize Negra,"Remera de algodón peinado 24/1, corte oversize. Talles S a XL.",18500,12,Indumentaria,https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600,si,"Talle: S, M, L, XL (+2000) | Color: Negro, Blanco"
+2,Buzo Canguro Gris,"Buzo de frisa invisible con capucha y bolsillo canguro. Súper abrigado.",42000,5,Indumentaria,https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600,si,"Talle: S, M, L"
+3,Gorra Bordada,"Gorra trucker con logo bordado al frente, regulable.",12000,0,Accesorios,https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=600,si,
+4,Taza Cerámica 350ml,"Taza de cerámica con diseño exclusivo. Apta microondas.",9500,20,Hogar,https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=600,si,"Diseño: Clásico, Floral, Frase"
+5,Tote Bag Natural,"Bolsa de lienzo 100% algodón, ideal para el día a día.",8000,8,Accesorios,https://images.unsplash.com/photo-1597484661643-2f5fef640dd1?w=600,si,
+6,Vela Aromática,"Vela de soja con esencia de vainilla y coco. 40 horas de duración.",11000,3,Hogar,https://images.unsplash.com/photo-1602874801007-bd458bb1b8b6?w=600,si,
