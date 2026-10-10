@@ -4,6 +4,7 @@
   const CFG = window.JIREH_CONFIG;
   const CART_KEY = "jireh-cart-v1";
   const ORDER_KEY = "jireh-order-v2";
+  const CLIENT_KEY = "jireh-client-v1";
   const $ = (sel) => document.querySelector(sel);
 
   const state = {
@@ -448,7 +449,7 @@
         const res = await fetch(CFG.ordersUrl, {
           method: "POST",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({ action: "quote", ...dest }),
+          body: JSON.stringify({ action: "quote", cid: clientId(), ...dest }),
           signal: AbortSignal.timeout(15000),
         });
         r = await res.json();
@@ -535,6 +536,18 @@
     return Array.from(rnd, (n) => chars[n % chars.length]).join("");
   }
 
+  // Id al azar de este navegador: la hoja lo usa para limitar cuántas
+  // consultas y pedidos se mandan seguidos (ver LIMITS en Ordenes.gs).
+  function clientId() {
+    try {
+      let id = localStorage.getItem(CLIENT_KEY);
+      if (!id) localStorage.setItem(CLIENT_KEY, (id = newRef() + newRef()));
+      return id;
+    } catch {
+      return null;
+    }
+  }
+
   function orderRefFor(lines) {
     const sig = JSON.stringify(lines.map((l) => [l.key, l.qty]));
     try {
@@ -555,7 +568,7 @@
       const res = await fetch(CFG.ordersUrl, {
         method: "POST",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(order),
+        body: JSON.stringify({ ...order, cid: clientId() }),
         signal: AbortSignal.timeout(10000),
       });
       const json = await res.json();

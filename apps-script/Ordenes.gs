@@ -34,24 +34,101 @@ function probarEnvio() {
 
 function doPost(e) {
   try {
+    if (!e.postData || e.postData.contents.length > MAX_BODY) return json({ ok: false, error: "pedido inválido" });
     const o = JSON.parse(e.postData.contents);
-    if (o.action === "quote") return json(quote(o));
+    const action = o.action === "quote" ? "quote" : "order";
+    const cid = /^[A-Z0-9]{8,32}$/i.test(o.cid || "") ? o.cid : null;
+    if (rateLimited(action, cid)) {
+      return json({ ok: false, limited: true, error: "Hay muchas consultas en este momento. Probá de nuevo en un minuto." });
+    }
+    if (action === "quote") {
+      return json(quote(o.lat != null ? { lat: o.lat, lng: o.lng } : { address: clean(o.address, 200) }));
+    }
     return json(saveOrder(o));
   } catch (err) {
-    return json({ ok: false, error: String(err) });
+    console.error(err);
+    return json({ ok: false, error: "No pudimos procesar el pedido." });
   }
+}
+
+// ------------------------------------------------------------
+//  Límites de uso
+// ------------------------------------------------------------
+// Apps Script no da la IP del visitante, así que se combinan dos límites:
+//  - global: protege la cuota diaria de Google Maps y la hoja
+//  - por navegador (cid, un id al azar que guarda la web): se puede falsear,
+//    pero frena dobles clics y abusos simples
+// Cada regla es [ventana en segundos, máximo de pedidos en esa ventana].
+// La ventana más larga posible es 21600 (6 h), el máximo del caché de Google.
+const LIMITS = {
+  quote: { global: [[60, 40], [3600, 400]], client: [[60, 10], [3600, 60]] },
+  order: { global: [[60, 10], [3600, 60]], client: [[600, 5], [21600, 20]] },
+};
+const MAX_BODY = 20000; // bytes
+
+function rateLimited(action, cid) {
+  const now = Math.floor(Date.now() / 1000);
+  const rules = [];
+  LIMITS[action].global.forEach(([win, max]) =>
+    rules.push({ key: `rl:${action}:g:${win}:${Math.floor(now / win)}`, max, win }));
+  if (cid) LIMITS[action].client.forEach(([win, max]) =>
+    rules.push({ key: `rl:${action}:${cid}:${win}:${Math.floor(now / win)}`, max, win }));
+
+  const cache = CacheService.getScriptCache();
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(3000)) return false; // ante la duda, no frenar una venta
+  try {
+    const counts = cache.getAll(rules.map((r) => r.key));
+    if (rules.some((r) => Number(counts[r.key] || 0) >= r.max)) return true;
+    rules.forEach((r) => cache.put(r.key, String(Number(counts[r.key] || 0) + 1), Math.min(r.win + 60, 21600)));
+    return false;
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+// Texto de un campo: sin caracteres de control, con largo máximo, y si empieza
+// con = + - @ se le antepone ' para que la hoja no lo tome como fórmula.
+function clean(value, max) {
+  let s = String(value == null ? "" : value).replace(/[\u0000-\u0009\u000B-\u001F\u007F]/g, " ").trim().slice(0, max);
+  if (/^[=+\-@]/.test(s)) s = "'" + s;
+  return s;
 }
 
 // ------------------------------------------------------------
 //  Pedidos
 // ------------------------------------------------------------
-function saveOrder(o) {
-  if (!o.ref || !Array.isArray(o.items) || !o.items.length) return { ok: false, error: "pedido inválido" };
+function saveOrder(raw) {
+  if (!/^[A-Z0-9]{6}$/.test(raw.ref || "") || !Array.isArray(raw.items) || !raw.items.length || raw.items.length > 50) {
+    return { ok: false, error: "pedido inválido" };
+  }
+  const o = {
+    ref: raw.ref,
+    nombre: clean(raw.nombre, 80),
+    entrega: clean(raw.entrega, 60),
+    direccion: clean(raw.direccion, 200),
+    notas: clean(raw.notas, 500),
+    envio: raw.envio ? {
+      dia: clean(raw.envio.dia, 40),
+      km: Number(raw.envio.km) || 0,
+      costo: Number(raw.envio.costo) || 0,
+      lat: Number.isFinite(Number(raw.envio.lat)) && raw.envio.lat != null ? Number(raw.envio.lat) : null,
+      lng: Number.isFinite(Number(raw.envio.lng)) && raw.envio.lng != null ? Number(raw.envio.lng) : null,
+    } : null,
+    items: raw.items.map((i) => ({
+      id: clean(i.id, 40),
+      name: clean(i.name, 120),
+      options: clean(i.options, 120),
+      qty: Math.min(99, Math.max(1, Math.floor(Number(i.qty)) || 1)),
+      subtotal: Math.max(0, Number(i.subtotal) || 0),
+    })),
+  };
+  if (!o.nombre) return { ok: false, error: "pedido inválido" };
 
   // El costo del envío se recalcula acá: el que manda la web es solo de referencia
   let envio = null;
   if (o.envio) {
-    const q = quote(o.envio.lat != null ? o.envio : { address: o.direccion });
+    const q = quote(o.envio.lat != null ? { lat: o.envio.lat, lng: o.envio.lng } : { address: o.direccion });
     envio = q.ok ? q : { km: o.envio.km, costo: o.envio.costo, lat: o.envio.lat, lng: o.envio.lng };
   }
 

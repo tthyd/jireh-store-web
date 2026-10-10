@@ -92,6 +92,19 @@ Cuando el cliente elige **Envío a domicilio**, escribe su dirección (o toca *U
 - En *Ordenes* quedan el día, los km, el costo del envío y un link de Google Maps al punto de entrega. El *Total* incluye el envío.
 - Para probar la tarifa sin la web: en el editor de Apps Script ejecutá `probarEnvio` y mirá el registro.
 
+## 2d. Límites de uso y validación
+
+El Apps Script limita cuántas consultas recibe (`LIMITS` en `apps-script/Ordenes.gs`), para proteger la cuota de Google Maps y que nadie llene la hoja de basura:
+
+| | Global (todos juntos) | Por navegador |
+|---|---|---|
+| Cálculo de envío | 40/min · 400/hora | 10/min · 60/hora |
+| Pedidos | 10/min · 60/hora | 5 cada 10 min · 20 cada 6 h |
+
+- Apps Script no da la IP del visitante: el límite por navegador usa un id al azar que guarda la web. Se puede falsear, por eso también hay límite global.
+- Si se pasa el límite de pedidos, la venta no se frena: el WhatsApp sale igual con un código provisorio en vez del número correlativo.
+- Todo lo que llega se valida: largo máximo de cada campo, hasta 50 productos y 99 unidades por línea, y los textos que empiezan con `=`, `+`, `-` o `@` se guardan como texto para que la hoja no los ejecute como fórmula.
+
 ## 3. Probar localmente
 
 Hace falta un servidor local (abrir el `index.html` con doble clic no permite leer el CSV):
